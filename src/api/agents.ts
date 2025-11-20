@@ -1,5 +1,5 @@
 import { api } from '@/lib/api';
-import type { Agent, CreateAgentInput, UpdateAgentInput } from '@/types/agent';
+import type { Agent, CreateAgentInput, UpdateAgentInput, SchemaField } from '@/types/agent';
 
 export const agentsApi = {
   // Get all agents
@@ -45,6 +45,16 @@ export const agentsApi = {
   // Unpublish agent
   unpublish: async (id: string): Promise<Agent> => {
     return api.post<Agent>(`/agents/${id}/unpublish`, {});
+  },
+
+  // Update schema only
+  updateSchema: async (id: string, schema: SchemaField[]): Promise<Agent> => {
+    return api.patch<Agent>(`/agents/${id}/schema`, { schema });
+  },
+
+  // Get schema validation preview
+  validateSchema: async (id: string, schema: SchemaField[]): Promise<{ valid: boolean; errors: string[] }> => {
+    return api.post<{ valid: boolean; errors: string[] }>(`/agents/${id}/schema/validate`, { schema });
   },
 };
 
