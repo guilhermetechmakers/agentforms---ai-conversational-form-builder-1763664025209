@@ -30,6 +30,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useCurrentUser, useChangePassword, useToggle2FA } from "@/hooks/useAuth";
+import { TwoFactorSetup } from "@/components/auth/TwoFactorSetup";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   useWorkspace,
   useUpdateWorkspace,
@@ -134,6 +136,7 @@ type WebhookForm = z.infer<typeof webhookSchema>;
 type AllowedIPForm = z.infer<typeof allowedIPSchema>;
 
 export function SettingsPage() {
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("account");
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
@@ -145,6 +148,7 @@ export function SettingsPage() {
   const [webhookToDelete, setWebhookToDelete] = useState<string | null>(null);
   const [newApiKey, setNewApiKey] = useState<string | null>(null);
   const [showApiKeySuccess, setShowApiKeySuccess] = useState(false);
+  const [show2FASetup, setShow2FASetup] = useState(false);
 
   // Data hooks
   const { data: user } = useCurrentUser();
@@ -426,20 +430,41 @@ export function SettingsPage() {
                 Add an extra layer of security to your account
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label>Enable 2FA</Label>
                   <p className="text-sm text-medium-gray">
-                    Require a verification code in addition to your password
+                    {user?.two_factor_enabled
+                      ? "Two-factor authentication is enabled"
+                      : "Require a verification code in addition to your password"}
                   </p>
                 </div>
                 <Switch
                   checked={user?.two_factor_enabled || false}
-                  onCheckedChange={(checked) => toggle2FA.mutate(checked)}
+                  onCheckedChange={(checked) => {
+                    if (checked && !user?.two_factor_enabled) {
+                      // Show setup flow for enabling
+                      setShow2FASetup(true);
+                    } else {
+                      // Direct toggle for disabling
+                      toggle2FA.mutate(checked);
+                    }
+                  }}
                   disabled={toggle2FA.isPending}
                 />
               </div>
+              {user?.two_factor_enabled && (
+                <div className="rounded-lg bg-pale-gray/50 p-4 space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    <span className="font-medium text-foreground">2FA is active</span>
+                  </div>
+                  <p className="text-xs text-medium-gray">
+                    Your account is protected with two-factor authentication. You can disable it at any time.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -1479,6 +1504,20 @@ export function SettingsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* 2FA Setup Dialog */}
+      <Dialog open={show2FASetup} onOpenChange={setShow2FASetup}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <TwoFactorSetup
+            onComplete={() => {
+              setShow2FASetup(false);
+              // Refresh user data
+              queryClient.invalidateQueries({ queryKey: ['auth', 'user'] });
+            }}
+            onCancel={() => setShow2FASetup(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

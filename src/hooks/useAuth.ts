@@ -171,3 +171,39 @@ export const useToggle2FA = () => {
     },
   });
 };
+
+// Get 2FA setup data query
+export const use2FASetup = () => {
+  return useQuery({
+    queryKey: ['auth', '2fa-setup'],
+    queryFn: usersApi.get2FASetup,
+    retry: false,
+    staleTime: 0, // Always fetch fresh
+  });
+};
+
+// Verify 2FA setup mutation
+export const useVerify2FASetup = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: usersApi.verify2FASetup,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: authKeys.user });
+      toast.success('2FA enabled successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(`2FA verification failed: ${error.message || 'Invalid code'}`);
+    },
+  });
+};
+
+// Get 2FA backup codes query
+export const use2FABackupCodes = () => {
+  return useQuery({
+    queryKey: ['auth', '2fa-backup-codes'],
+    queryFn: usersApi.get2FABackupCodes,
+    retry: false,
+    staleTime: 0,
+  });
+};

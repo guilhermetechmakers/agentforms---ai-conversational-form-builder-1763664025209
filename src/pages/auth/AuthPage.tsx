@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PasswordStrengthMeter } from "@/components/ui/password-strength-meter";
 import { useSignIn, useSignUp } from "@/hooks/useAuth";
 import { Mail, Lock, User, Chrome } from "lucide-react";
 import { authApi } from "@/api/auth";
@@ -63,6 +64,8 @@ export function AuthPage() {
       terms_accepted: false,
     },
   });
+
+  const passwordValue = signupForm.watch("password");
 
   // Update mode when route changes
   useEffect(() => {
@@ -299,8 +302,11 @@ export function AuthPage() {
                     {...signupForm.register("password")}
                   />
                 </div>
+                {passwordValue && (
+                  <PasswordStrengthMeter password={passwordValue} />
+                )}
                 {signupForm.formState.errors.password && (
-                  <p className="text-sm text-deep-orange">
+                  <p className="text-sm text-deep-orange animate-fade-in">
                     {signupForm.formState.errors.password.message}
                   </p>
                 )}
