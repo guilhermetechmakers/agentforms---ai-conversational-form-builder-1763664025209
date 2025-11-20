@@ -1,68 +1,167 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap');
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
+/* Design System with CSS Custom Properties */
+@layer base {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    /* Primary colors - RGB format (space-separated) */
+    --background: 248 249 251; /* #F8F9FB - Soft white background */
+    --foreground: 35 38 47; /* #23262F - Charcoal Black */
+    
+    /* Primary action color */
+    --primary: 123 140 255; /* #7B8CFF - Light Blue */
+    --primary-foreground: 255 255 255;
+    
+    /* Secondary colors */
+    --secondary: 161 164 178; /* #A1A4B2 - Medium Gray */
+    --secondary-foreground: 255 255 255;
+    
+    /* Card colors */
+    --card: 255 255 255; /* White */
+    --card-foreground: 35 38 47; /* Charcoal Black */
+    
+    /* Border and input colors */
+    --border: 236 236 236; /* #ECECEC - Pale Gray */
+    --input: 236 236 236; /* #ECECEC - Pale Gray */
+    --ring: 123 140 255; /* #7B8CFF - Light Blue */
+    
+    /* Accent colors for charts and highlights */
+    --accent: 255 211 156; /* #FFD39C - Light Orange */
+    --accent-foreground: 35 38 47;
+    
+    /* Border radius */
+    --radius: 1rem; /* 16px - default card radius */
   }
-  a:hover {
-    color: #747bff;
+}
+
+@layer base {
+  * {
+    @apply border-border;
   }
-  button {
-    background-color: #f9f9f9;
+  
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', 'Nunito', sans-serif;
   }
+  
+  /* Typography hierarchy */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+    line-height: 1.2;
+    color: rgb(var(--foreground));
+  }
+  
+  h1 {
+    @apply text-4xl md:text-5xl;
+  }
+  
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+  
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+  
+  h4 {
+    @apply text-xl md:text-2xl;
+  }
+  
+  h5 {
+    @apply text-lg md:text-xl;
+  }
+  
+  h6 {
+    @apply text-base md:text-lg;
+  }
+}
+
+@layer components {
+  /* Card styles matching design system */
+  .card-base {
+    @apply bg-card text-card-foreground rounded-2xl shadow-card;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  
+  .card-base:hover {
+    @apply shadow-card-hover;
+    transform: translateY(-2px);
+  }
+  
+  /* Button styles */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground rounded-lg font-medium;
+    @apply transition-all duration-200 hover:scale-105 hover:shadow-lg;
+    @apply active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-primary rounded-lg font-medium border border-pale-gray;
+    @apply transition-all duration-200 hover:scale-105 hover:shadow-md;
+    @apply active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+  }
+  
+  /* Input styles */
+  .input-base {
+    @apply rounded-lg border border-pale-gray bg-white;
+    @apply focus:border-primary focus:ring-2 focus:ring-primary/20;
+    @apply transition-all duration-200;
+  }
+  
+  /* Sidebar navigation active state */
+  .nav-active {
+    @apply bg-charcoal text-white rounded-full;
+  }
+  
+  .nav-inactive {
+    @apply bg-white text-charcoal;
+  }
+}
+
+/* Smooth Scrolling */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Custom Animations */
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+
+/* Focus Visible for Accessibility */
+:focus-visible {
+  outline: 2px solid rgb(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--border));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--secondary));
 }
