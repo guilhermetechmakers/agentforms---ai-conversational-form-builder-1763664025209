@@ -138,3 +138,36 @@ export const useCheckVerificationStatus = () => {
     enabled: !!localStorage.getItem('auth_token'),
   });
 };
+
+// Change password mutation
+export const useChangePassword = () => {
+  return useMutation({
+    mutationFn: ({ currentPassword, newPassword }: { currentPassword: string; newPassword: string }) => {
+      return usersApi.changePassword(currentPassword, newPassword);
+    },
+    onSuccess: () => {
+      toast.success('Password changed successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to change password: ${error.message || 'Invalid current password'}`);
+    },
+  });
+};
+
+// Toggle 2FA mutation
+export const useToggle2FA = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (enabled: boolean) => {
+      return usersApi.toggle2FA(enabled);
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(authKeys.user, data);
+      toast.success(`2FA ${data.two_factor_enabled ? 'enabled' : 'disabled'} successfully!`);
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to toggle 2FA: ${error.message || 'Unknown error'}`);
+    },
+  });
+};
