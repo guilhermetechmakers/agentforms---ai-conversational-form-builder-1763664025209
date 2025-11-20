@@ -1,5 +1,11 @@
 import { api } from '@/lib/api';
-import type { Session, SessionFilter } from '@/types/session';
+import type { 
+  Session, 
+  SessionFilter, 
+  SessionCreateRequest, 
+  SessionStateUpdate,
+  RetentionPolicy 
+} from '@/types/session';
 
 export const sessionsApi = {
   // Get all sessions with filters
@@ -86,5 +92,45 @@ export const sessionsApi = {
   // Bulk resend webhooks
   bulkResendWebhooks: async (sessionIds: string[]): Promise<void> => {
     return api.post('/sessions/bulk-resend-webhooks', { session_ids: sessionIds });
+  },
+
+  // Create new session
+  create: async (data: SessionCreateRequest): Promise<Session> => {
+    return api.post<Session>('/sessions', data);
+  },
+
+  // Update session state (pause, resume, terminate)
+  updateState: async (sessionId: string, stateUpdate: SessionStateUpdate): Promise<Session> => {
+    return api.patch<Session>(`/sessions/${sessionId}/state`, stateUpdate);
+  },
+
+  // Pause session
+  pause: async (sessionId: string, reason?: string): Promise<Session> => {
+    return sessionsApi.updateState(sessionId, { state: 'paused', reason });
+  },
+
+  // Resume session
+  resume: async (sessionId: string): Promise<Session> => {
+    return sessionsApi.updateState(sessionId, { state: 'running' });
+  },
+
+  // Terminate session
+  terminate: async (sessionId: string, reason?: string): Promise<Session> => {
+    return sessionsApi.updateState(sessionId, { state: 'stopped', reason });
+  },
+
+  // Get retention policy for session
+  getRetentionPolicy: async (sessionId: string): Promise<RetentionPolicy> => {
+    return api.get<RetentionPolicy>(`/sessions/${sessionId}/retention-policy`);
+  },
+
+  // Update retention policy for session
+  updateRetentionPolicy: async (sessionId: string, policy: Partial<RetentionPolicy>): Promise<RetentionPolicy> => {
+    return api.patch<RetentionPolicy>(`/sessions/${sessionId}/retention-policy`, policy);
+  },
+
+  // Get retention policies for agent
+  getAgentRetentionPolicies: async (agentId: string): Promise<RetentionPolicy[]> => {
+    return api.get<RetentionPolicy[]>(`/agents/${agentId}/retention-policies`);
   },
 };

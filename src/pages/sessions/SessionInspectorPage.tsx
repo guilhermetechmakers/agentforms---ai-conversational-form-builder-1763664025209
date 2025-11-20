@@ -29,6 +29,8 @@ import { TranscriptPane } from "@/components/sessions/TranscriptPane";
 import { CapturedDataPanel } from "@/components/sessions/CapturedDataPanel";
 import { WebhookLogPanel } from "@/components/sessions/WebhookLogPanel";
 import { ExportSessionDialog } from "@/components/sessions/ExportSessionDialog";
+import { SessionStateControls } from "@/components/sessions/SessionStateControls";
+import { RetentionPolicyPanel } from "@/components/sessions/RetentionPolicyPanel";
 import { sessionsApi } from "@/api/sessions";
 
 export function SessionInspectorPage() {
@@ -119,12 +121,16 @@ export function SessionInspectorPage() {
     active: "bg-green-100 text-green-800",
     completed: "bg-blue-100 text-blue-800",
     abandoned: "bg-gray-100 text-gray-800",
+    paused: "bg-yellow-100 text-yellow-800",
+    terminated: "bg-red-100 text-red-800",
   };
 
   const statusLabels = {
     active: "Active",
     completed: "Completed",
     abandoned: "Abandoned",
+    paused: "Paused",
+    terminated: "Terminated",
   };
 
   return (
@@ -147,44 +153,49 @@ export function SessionInspectorPage() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <Button
-            variant="secondary"
-            onClick={copyPublicLink}
-            className="flex items-center gap-2"
-          >
-            <Share2 className="h-4 w-4" />
-            Copy Link
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() => setExportDialogOpen(true)}
-            className="flex items-center gap-2"
-          >
-            <Download className="h-4 w-4" />
-            Export
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={handleMarkReviewed}
-            disabled={markReviewed.isPending}
-            className="flex items-center gap-2"
-          >
-            {markReviewed.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <CheckCircle2 className="h-4 w-4" />
-            )}
-            Mark Reviewed
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => setDeleteDialogOpen(true)}
-            className="flex items-center gap-2"
-          >
-            <Trash2 className="h-4 w-4" />
-            Delete
-          </Button>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          {/* Session State Controls */}
+          {session && <SessionStateControls session={session} />}
+          
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              variant="secondary"
+              onClick={copyPublicLink}
+              className="flex items-center gap-2"
+            >
+              <Share2 className="h-4 w-4" />
+              Copy Link
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => setExportDialogOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleMarkReviewed}
+              disabled={markReviewed.isPending}
+              className="flex items-center gap-2"
+            >
+              {markReviewed.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <CheckCircle2 className="h-4 w-4" />
+              )}
+              Mark Reviewed
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => setDeleteDialogOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -221,6 +232,36 @@ export function SessionInspectorPage() {
                     <span>
                       Duration: {Math.floor(session.duration_seconds / 60)}m {session.duration_seconds % 60}s
                     </span>
+                  </>
+                )}
+                {session.paused_at && (
+                  <>
+                    <span>•</span>
+                    <span>
+                      Paused: {format(new Date(session.paused_at), "MMM d, yyyy 'at' h:mm a")}
+                    </span>
+                  </>
+                )}
+                {session.resumed_at && (
+                  <>
+                    <span>•</span>
+                    <span>
+                      Resumed: {format(new Date(session.resumed_at), "MMM d, yyyy 'at' h:mm a")}
+                    </span>
+                  </>
+                )}
+                {session.terminated_at && (
+                  <>
+                    <span>•</span>
+                    <span>
+                      Terminated: {format(new Date(session.terminated_at), "MMM d, yyyy 'at' h:mm a")}
+                    </span>
+                  </>
+                )}
+                {session.state && (
+                  <>
+                    <span>•</span>
+                    <span className="capitalize">State: {session.state}</span>
                   </>
                 )}
               </div>
@@ -263,6 +304,12 @@ export function SessionInspectorPage() {
                 >
                   Webhook Log
                 </TabsTrigger>
+                <TabsTrigger
+                  value="retention"
+                  className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none"
+                >
+                  Retention Policy
+                </TabsTrigger>
               </TabsList>
             </div>
 
@@ -282,6 +329,10 @@ export function SessionInspectorPage() {
                 sessionId={session.id}
                 webhookLogs={session.webhook_logs || []}
               />
+            </TabsContent>
+
+            <TabsContent value="retention" className="mt-0 p-6">
+              <RetentionPolicyPanel sessionId={session.id} />
             </TabsContent>
           </Tabs>
         </CardContent>

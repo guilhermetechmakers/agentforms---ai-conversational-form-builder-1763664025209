@@ -48,12 +48,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SessionModal } from "@/components/sessions/SessionModal";
 
 type SessionStatus = "all" | "active" | "completed" | "abandoned";
 
 export function SessionsListPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [sessionModalOpen, setSessionModalOpen] = useState(false);
   
   // Get agent_id from URL if present (for agent-specific sessions)
   const agentId = searchParams.get("agent_id") || undefined;
@@ -272,26 +274,47 @@ export function SessionsListPage() {
   };
   
   // Status badge colors
-  const getStatusBadge = (status: Session["status"]) => {
+  const getStatusBadge = (session: Session) => {
+    const status = session.status;
+    const state = session.state;
+    
     const variants = {
       active: "bg-green-100 text-green-800 border-green-200",
       completed: "bg-blue-100 text-blue-800 border-blue-200",
       abandoned: "bg-gray-100 text-gray-800 border-gray-200",
+      paused: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      terminated: "bg-red-100 text-red-800 border-red-200",
     };
     
     const labels = {
       active: "Active",
       completed: "Completed",
       abandoned: "Abandoned",
+      paused: "Paused",
+      terminated: "Terminated",
     };
     
     return (
-      <Badge
-        variant="outline"
-        className={cn("text-xs font-medium", variants[status])}
-      >
-        {labels[status]}
-      </Badge>
+      <div className="flex items-center gap-2">
+        <Badge
+          variant="outline"
+          className={cn("text-xs font-medium", variants[status] || variants.abandoned)}
+        >
+          {labels[status] || "Unknown"}
+        </Badge>
+        {state && state !== "running" && (
+          <Badge
+            variant="outline"
+            className={cn(
+              "text-xs font-medium",
+              state === "paused" && "bg-yellow-50 text-yellow-700 border-yellow-300",
+              state === "stopped" && "bg-gray-50 text-gray-700 border-gray-300"
+            )}
+          >
+            {state.charAt(0).toUpperCase() + state.slice(1)}
+          </Badge>
+        )}
+      </div>
     );
   };
   
@@ -306,6 +329,15 @@ export function SessionsListPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => setSessionModalOpen(true)}
+            className="bg-primary hover:bg-primary/90"
+          >
+            <MessageSquare className="h-4 w-4 mr-2" />
+            New Session
+          </Button>
           <Button
             variant="secondary"
             size="sm"
@@ -559,7 +591,7 @@ export function SessionsListPage() {
                           </Badge>
                         </td>
                         <td className="p-4">
-                          {getStatusBadge(session.status)}
+                          {getStatusBadge(session)}
                         </td>
                         <td className="p-4 text-sm text-medium-gray">
                           {session.agent_name || "—"}
@@ -632,7 +664,7 @@ export function SessionsListPage() {
                             </div>
                           </div>
                         </div>
-                        {getStatusBadge(session.status)}
+                        {getStatusBadge(session)}
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4 text-sm mb-4">
@@ -768,6 +800,16 @@ export function SessionsListPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Session Creation Modal */}
+      <SessionModal
+        open={sessionModalOpen}
+        onOpenChange={setSessionModalOpen}
+        defaultAgentId={agentId}
+        onSuccess={(sessionId) => {
+          navigate(`/dashboard/sessions/${sessionId}`);
+        }}
+      />
     </div>
   );
 }

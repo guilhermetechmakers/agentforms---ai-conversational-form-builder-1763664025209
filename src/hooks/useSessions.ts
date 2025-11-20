@@ -1,7 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { sessionsApi } from '@/api/sessions';
 import { toast } from 'sonner';
-import type { SessionFilter } from '@/types/session';
+import type { 
+  SessionFilter, 
+  SessionCreateRequest, 
+  RetentionPolicy 
+} from '@/types/session';
 
 // Query keys
 export const sessionKeys = {
@@ -139,6 +143,106 @@ export const useBulkResendWebhooks = () => {
     },
     onError: (error: Error) => {
       toast.error(`Failed to resend webhooks: ${error.message}`);
+    },
+  });
+};
+
+// Create session mutation
+export const useCreateSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: SessionCreateRequest) => sessionsApi.create(data),
+    onSuccess: (newSession) => {
+      queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
+      queryClient.setQueryData(sessionKeys.detail(newSession.id), newSession);
+      toast.success('Session created successfully!');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to create session: ${error.message}`);
+    },
+  });
+};
+
+// Pause session mutation
+export const usePauseSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ sessionId, reason }: { sessionId: string; reason?: string }) =>
+      sessionsApi.pause(sessionId, reason),
+    onSuccess: (updatedSession, { sessionId }) => {
+      queryClient.setQueryData(sessionKeys.detail(sessionId), updatedSession);
+      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionId) });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
+      toast.success('Session paused successfully!');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to pause session: ${error.message}`);
+    },
+  });
+};
+
+// Resume session mutation
+export const useResumeSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (sessionId: string) => sessionsApi.resume(sessionId),
+    onSuccess: (updatedSession, sessionId) => {
+      queryClient.setQueryData(sessionKeys.detail(sessionId), updatedSession);
+      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionId) });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
+      toast.success('Session resumed successfully!');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to resume session: ${error.message}`);
+    },
+  });
+};
+
+// Terminate session mutation
+export const useTerminateSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ sessionId, reason }: { sessionId: string; reason?: string }) =>
+      sessionsApi.terminate(sessionId, reason),
+    onSuccess: (updatedSession, { sessionId }) => {
+      queryClient.setQueryData(sessionKeys.detail(sessionId), updatedSession);
+      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionId) });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
+      toast.success('Session terminated successfully!');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to terminate session: ${error.message}`);
+    },
+  });
+};
+
+// Get retention policy for session
+export const useSessionRetentionPolicy = (sessionId: string) => {
+  return useQuery({
+    queryKey: [...sessionKeys.detail(sessionId), 'retention-policy'],
+    queryFn: () => sessionsApi.getRetentionPolicy(sessionId),
+    enabled: !!sessionId,
+  });
+};
+
+// Update retention policy mutation
+export const useUpdateRetentionPolicy = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ sessionId, policy }: { sessionId: string; policy: Partial<RetentionPolicy> }) =>
+      sessionsApi.updateRetentionPolicy(sessionId, policy),
+    onSuccess: (updatedPolicy, { sessionId }) => {
+      queryClient.setQueryData([...sessionKeys.detail(sessionId), 'retention-policy'], updatedPolicy);
+      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionId) });
+      toast.success('Retention policy updated successfully!');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to update retention policy: ${error.message}`);
     },
   });
 };
