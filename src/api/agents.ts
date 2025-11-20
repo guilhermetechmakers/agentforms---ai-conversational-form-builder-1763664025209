@@ -47,3 +47,17 @@ export const agentsApi = {
     return api.post<Agent>(`/agents/${id}/unpublish`, {});
   },
 };
+
+// Dashboard stats interface
+export interface DashboardStats {
+  total_agents: number;
+  active_sessions_today: number;
+  leads_collected_month: number;
+}
+
+export const statsApi = {
+  // Get dashboard stats
+  getDashboardStats: async (): Promise<DashboardStats> => {
+    return api.get<DashboardStats>('/dashboard/stats');
+  },
+};
