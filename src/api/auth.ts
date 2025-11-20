@@ -73,6 +73,11 @@ export const authApi = {
     return api.post('/auth/resend-verification', {});
   },
 
+  // Check verification status
+  checkVerificationStatus: async (): Promise<{ email_verified: boolean; email?: string }> => {
+    return api.get<{ email_verified: boolean; email?: string }>('/auth/verification-status');
+  },
+
   // OAuth sign in
   signInWithOAuth: (provider: 'google' | 'microsoft'): void => {
     const redirectUrl = `${window.location.origin}/auth/callback`;

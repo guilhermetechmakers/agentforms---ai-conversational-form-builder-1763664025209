@@ -127,3 +127,14 @@ export const useResendVerification = () => {
     },
   });
 };
+
+// Check verification status query
+export const useCheckVerificationStatus = () => {
+  return useQuery({
+    queryKey: ['auth', 'verification-status'],
+    queryFn: authApi.checkVerificationStatus,
+    retry: false,
+    staleTime: 0, // Always fetch fresh status
+    enabled: !!localStorage.getItem('auth_token'),
+  });
+};
