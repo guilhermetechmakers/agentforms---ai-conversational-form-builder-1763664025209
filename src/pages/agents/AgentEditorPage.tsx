@@ -13,7 +13,7 @@ import { SchemaPreviewPanel } from "@/components/agents/SchemaPreviewPanel";
 import { useAgent, useCreateAgent, useUpdateAgent, usePublishAgent } from "@/hooks/useAgents";
 import { useAutosave } from "@/hooks/useAutosave";
 import { toast } from "sonner";
-import { Save, History, ArrowLeft, Loader2 } from "lucide-react";
+import { Save, History, ArrowLeft, Loader2, Settings } from "lucide-react";
 import { VersionHistoryDialog } from "@/components/agents/VersionHistoryDialog";
 import type { SchemaField, UpdateAgentInput } from "@/types/agent";
 
@@ -381,9 +381,31 @@ export function AgentEditorPage() {
                     <p className="text-medium-gray">
                       Configure webhooks, access controls, and more
                     </p>
-                    <div className="text-center py-12 text-medium-gray">
-                      <p>Advanced settings coming soon</p>
-                    </div>
+                    {!isNew && id && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Webhook Configuration</CardTitle>
+                          <CardDescription>
+                            Set up webhooks to automatically forward session data to external systems
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button
+                            variant="outline"
+                            onClick={() => navigate(`/dashboard/agents/${id}/webhooks`)}
+                            className="w-full"
+                          >
+                            <Settings className="mr-2 h-4 w-4" />
+                            Configure Webhooks
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    )}
+                    {isNew && (
+                      <div className="text-center py-12 text-medium-gray">
+                        <p>Save your agent first to configure webhooks and advanced settings</p>
+                      </div>
+                    )}
                   </div>
                 </TabsContent>
               </Tabs>

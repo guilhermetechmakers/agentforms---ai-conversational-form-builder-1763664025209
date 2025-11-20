@@ -14,6 +14,7 @@ import { SettingsPage } from "@/pages/settings/SettingsPage";
 import { AdminDashboardPage } from "@/pages/admin/AdminDashboardPage";
 import { AboutHelpPage } from "@/pages/docs/AboutHelpPage";
 import { KnowledgePage } from "@/pages/knowledge/KnowledgePage";
+import { WebhookConfigurationPage } from "@/pages/webhooks/WebhookConfigurationPage";
 import { LandingPage } from "@/pages/landing/LandingPage";
 import { NotFoundPage } from "@/pages/error/NotFoundPage";
 import { ErrorPage } from "@/pages/error/ErrorPage";
@@ -61,6 +62,7 @@ function App() {
             <Route path="agents/new" element={<AgentEditorPage />} />
             <Route path="agents/:id" element={<AgentEditorPage />} />
             <Route path="agents/:id/sessions" element={<SessionsListPage />} />
+            <Route path="agents/:agentId/webhooks" element={<WebhookConfigurationPage />} />
             <Route path="sessions" element={<SessionsListPage />} />
             <Route path="sessions/:id" element={<SessionInspectorPage />} />
             <Route path="knowledge" element={<KnowledgePage />} />
