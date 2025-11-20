@@ -82,4 +82,9 @@ export const sessionsApi = {
   markReviewed: async (sessionId: string): Promise<Session> => {
     return api.patch<Session>(`/sessions/${sessionId}/reviewed`, {});
   },
+
+  // Bulk resend webhooks
+  bulkResendWebhooks: async (sessionIds: string[]): Promise<void> => {
+    return api.post('/sessions/bulk-resend-webhooks', { session_ids: sessionIds });
+  },
 };

@@ -126,3 +126,19 @@ export const useMarkSessionReviewed = () => {
     },
   });
 };
+
+// Bulk resend webhooks mutation
+export const useBulkResendWebhooks = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (sessionIds: string[]) => sessionsApi.bulkResendWebhooks(sessionIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
+      toast.success('Webhooks resent successfully!');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to resend webhooks: ${error.message}`);
+    },
+  });
+};
