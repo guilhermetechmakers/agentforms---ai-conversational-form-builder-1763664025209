@@ -17,6 +17,11 @@ import { LandingPage } from "@/pages/landing/LandingPage";
 import { NotFoundPage } from "@/pages/error/NotFoundPage";
 import { ErrorPage } from "@/pages/error/ErrorPage";
 import { MaintenancePage } from "@/pages/error/MaintenancePage";
+import { PrivacyPolicyPage } from "@/pages/legal/PrivacyPolicyPage";
+import { TermsOfServicePage } from "@/pages/legal/TermsOfServicePage";
+import { CookiePolicyPage } from "@/pages/legal/CookiePolicyPage";
+import { DataProcessingAddendumPage } from "@/pages/legal/DataProcessingAddendumPage";
+import { CookieConsentBanner } from "@/components/legal/CookieConsentBanner";
 
 // React Query client with optimal defaults
 const queryClient = new QueryClient({
@@ -43,6 +48,12 @@ function App() {
           <Route path="/reset-password" element={<PasswordResetPage />} />
           <Route path="/chat/:slug" element={<PublicChatPage />} />
           
+          {/* Legal & Compliance routes */}
+          <Route path="/legal/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/legal/terms-of-service" element={<TermsOfServicePage />} />
+          <Route path="/legal/cookie-policy" element={<CookiePolicyPage />} />
+          <Route path="/legal/data-processing-addendum" element={<DataProcessingAddendumPage />} />
+          
           {/* Dashboard routes (protected) */}
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
@@ -64,6 +75,7 @@ function App() {
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" richColors />
+      <CookieConsentBanner />
     </QueryClientProvider>
   );
 }
