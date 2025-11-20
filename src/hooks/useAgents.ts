@@ -30,6 +30,15 @@ export const useAgent = (id: string) => {
   });
 };
 
+// Get agent by slug (public)
+export const useAgentBySlug = (slug: string | null) => {
+  return useQuery({
+    queryKey: [...agentKeys.all, 'slug', slug],
+    queryFn: () => agentsApi.getBySlug(slug!),
+    enabled: !!slug,
+  });
+};
+
 // Create agent mutation
 export const useCreateAgent = () => {
   const queryClient = useQueryClient();

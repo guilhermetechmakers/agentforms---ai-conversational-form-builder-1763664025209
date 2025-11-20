@@ -12,6 +12,11 @@ export const agentsApi = {
     return api.get<Agent>(`/agents/${id}`);
   },
 
+  // Get agent by slug (public)
+  getBySlug: async (slug: string): Promise<Agent> => {
+    return api.get<Agent>(`/agents/public/${slug}`);
+  },
+
   // Create new agent
   create: async (agent: CreateAgentInput): Promise<Agent> => {
     return api.post<Agent>('/agents', agent);
