@@ -90,3 +90,39 @@ export const useResendWebhook = () => {
     },
   });
 };
+
+// Update captured data mutation
+export const useUpdateCapturedData = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ sessionId, data }: { sessionId: string; data: Record<string, any> }) =>
+      sessionsApi.updateCapturedData(sessionId, data),
+    onSuccess: (updatedSession, { sessionId }) => {
+      queryClient.setQueryData(sessionKeys.detail(sessionId), updatedSession);
+      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionId) });
+      toast.success('Captured data updated successfully!');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to update data: ${error.message}`);
+    },
+  });
+};
+
+// Mark session as reviewed mutation
+export const useMarkSessionReviewed = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (sessionId: string) => sessionsApi.markReviewed(sessionId),
+    onSuccess: (updatedSession, sessionId) => {
+      queryClient.setQueryData(sessionKeys.detail(sessionId), updatedSession);
+      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionId) });
+      queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
+      toast.success('Session marked as reviewed!');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to mark session as reviewed: ${error.message}`);
+    },
+  });
+};

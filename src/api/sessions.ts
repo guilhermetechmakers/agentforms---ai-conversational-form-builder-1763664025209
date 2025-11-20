@@ -60,4 +60,26 @@ export const sessionsApi = {
   resendWebhook: async (sessionId: string, webhookLogId: string): Promise<void> => {
     return api.post(`/sessions/${sessionId}/webhooks/${webhookLogId}/retry`, {});
   },
+
+  // Export single session
+  exportSession: async (sessionId: string, format: 'json' | 'csv' = 'json'): Promise<Blob> => {
+    const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/sessions/${sessionId}/export?format=${format}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+      },
+    });
+    
+    if (!response.ok) throw new Error('Export failed');
+    return response.blob();
+  },
+
+  // Update captured data
+  updateCapturedData: async (sessionId: string, data: Record<string, any>): Promise<Session> => {
+    return api.patch<Session>(`/sessions/${sessionId}/captured-data`, { data });
+  },
+
+  // Mark session as reviewed
+  markReviewed: async (sessionId: string): Promise<Session> => {
+    return api.patch<Session>(`/sessions/${sessionId}/reviewed`, {});
+  },
 };
