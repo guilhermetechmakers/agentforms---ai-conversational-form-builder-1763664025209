@@ -2,8 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { LoginPage } from "@/pages/auth/LoginPage";
-import { SignupPage } from "@/pages/auth/SignupPage";
+import { AuthPage } from "@/pages/auth/AuthPage";
 import { EmailVerificationPage } from "@/pages/auth/EmailVerificationPage";
 import { PasswordResetPage } from "@/pages/auth/PasswordResetPage";
 import { DashboardPage } from "@/pages/dashboard/DashboardPage";
@@ -37,8 +36,8 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/signup" element={<AuthPage />} />
           <Route path="/verify-email" element={<EmailVerificationPage />} />
           <Route path="/reset-password" element={<PasswordResetPage />} />
           <Route path="/chat/:slug" element={<PublicChatPage />} />
