@@ -13,6 +13,7 @@ import { SessionsListPage } from "@/pages/sessions/SessionsListPage";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
 import { AdminDashboardPage } from "@/pages/admin/AdminDashboardPage";
 import { AboutHelpPage } from "@/pages/docs/AboutHelpPage";
+import { KnowledgePage } from "@/pages/knowledge/KnowledgePage";
 import { LandingPage } from "@/pages/landing/LandingPage";
 import { NotFoundPage } from "@/pages/error/NotFoundPage";
 import { ErrorPage } from "@/pages/error/ErrorPage";
@@ -62,6 +63,7 @@ function App() {
             <Route path="agents/:id/sessions" element={<SessionsListPage />} />
             <Route path="sessions" element={<SessionsListPage />} />
             <Route path="sessions/:id" element={<SessionInspectorPage />} />
+            <Route path="knowledge" element={<KnowledgePage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="help" element={<AboutHelpPage />} />
             <Route path="admin" element={<AdminDashboardPage />} />
