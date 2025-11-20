@@ -5,6 +5,7 @@ import {
   MessageSquare, 
   Settings, 
   Shield,
+  HelpCircle,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
@@ -14,6 +15,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Sessions", href: "/dashboard/sessions", icon: MessageSquare },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  { name: "Help", href: "/dashboard/help", icon: HelpCircle },
   { name: "Admin", href: "/dashboard/admin", icon: Shield },
 ];
 
